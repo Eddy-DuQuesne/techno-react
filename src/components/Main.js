@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Sequencer } from 'react-nexusui';
+import { Sequencer, Position } from 'react-nexusui';
 import * as Tone from 'tone';
 import {getBlankSequence} from '../helpers/sequencer.js'
 import Loop from '../loops/Loop.js';
@@ -29,13 +29,13 @@ class Main extends Component {
         this.lead.loop.stop();
     }
     componentDidMount() {
-        console.log('did mount');
         const blankSequence = getBlankSequence();
         this.setState({
             sequence: blankSequence
         });            
-        this.lead = new Loop(); 
+        this.lead = new Loop(blankSequence); 
     }
+
     onSequencerChange = ({row, column, state}) => {
         let sequence = [...this.state.sequence];        
         let newColumn = [...sequence[0]];
@@ -53,11 +53,15 @@ class Main extends Component {
               <Sequencer
                 rows={4}
                 columns={16}                
-                size={[400, 200]}              
+                size={[800, 200]}              
                 value={this.state.sequence}
                 onStep={console.warn}
                 onChange={this.onSequencerChange}
             />
+            <Position
+                size={[150, 150]}
+            />
+            
           <button onClick={this.startAudioContext}>Start</button>
           <button onClick={this.play}>Play</button>
           <button onClick={this.stop}>Stop</button>
