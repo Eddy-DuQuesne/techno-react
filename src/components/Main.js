@@ -2,32 +2,15 @@ import React, { Component } from 'react';
 import { Sequencer } from 'react-nexusui';
 import * as Tone from 'tone';
 import {getBlankSequence} from '../helpers/sequencer.js'
-import {simpleSynth} from '../instruments/synths.js';
+import Loop from '../loops/Loop.js';
 
 class Main extends Component {
     state = {
         sequence: []
     }
 
-    arpLoop = new Tone.Sequence((time, col) => {
-        const seq = ['C3', 'E3', 'G3', 'B3'];
-        for (let i = 0; i < 4; i++) {
-            const sequence = [...this.state.sequence];
-            const column = [...sequence[col]]; 
-            console.log(column);                    
-            if (column[i] === true) {                
-                simpleSynth.triggerAttackRelease(seq[i], "8n");
-            }
-        }
-    }, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "16n");
-
     startAudioContext = async () => {
-        await Tone.start()
-        const blankSequence = getBlankSequence();
-        this.setState({
-            sequence: blankSequence
-        });
-                
+        await Tone.start()       
     }
 
     getSequence = () => {
@@ -37,22 +20,29 @@ class Main extends Component {
     play = () => {
         console.log('PLAY');
         Tone.Transport.start();
-        this.arpLoop.start();
+        this.lead.loop.start();
     }
 
     stop = () => {
         console.log('STOP');
         Tone.Transport.stop();
-        this.arpLoop.stop();
+        this.lead.loop.stop();
     }
-
+    componentDidMount() {
+        console.log('did mount');
+        const blankSequence = getBlankSequence();
+        this.setState({
+            sequence: blankSequence
+        });            
+        this.lead = new Loop(); 
+    }
     onSequencerChange = ({row, column, state}) => {
         let sequence = [...this.state.sequence];        
         let newColumn = [...sequence[0]];
         newColumn[row] = state;
         sequence[column] = newColumn;  
-        console.log(sequence);  
         this.setState({sequence: sequence});
+        this.lead.setSequence(sequence);
     }
               
 
